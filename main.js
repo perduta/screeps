@@ -1,11 +1,11 @@
+var garbageCollector = require('garbagecollector');
 var spawnsManager = require('manager.spawns');
 var creepsManager = require('manager.creeps');
-
-var garbageCollector = require('garbagecollector');
+var towersManager = require('manager.towers');
 
 module.exports.loop = () => {
   garbageCollector();
-
   spawnsManager();
   creepsManager();
+  towersManager();
 };
