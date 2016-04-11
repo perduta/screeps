@@ -30,23 +30,29 @@ module.exports = (c) => {
   else {
     // first looking for target
     if (!c.memory.destinationId) {
-      var spawnsAndExtensionsWithNoEnergy = c.room.find(FIND_MY_STRUCTURES, {filter: (e) => (e.structureType == STRUCTURE_SPAWN || e.structureType == STRUCTURE_EXTENSION) && e.energy < e.energyCapacity});
+      var spawnsAndExtensionsWithNoEnergy = c.room.find(FIND_MY_STRUCTURES, {filter: (e) => (e.structureType == STRUCTURE_SPAWN || e.structureType == STRUCTURE_EXTENSION || e.structureType == STRUCTURE_TOWER) && e.energy < e.energyCapacity});
       if (spawnsAndExtensionsWithNoEnergy.length) {
-        c.memory.destinationId = c.pos.findClosestByPath(spawnsAndExtensionsWithNoEnergy).id;
+        var destination = c.pos.findClosestByPath(spawnsAndExtensionsWithNoEnergy);
+        if(!destination) return;
+        c.memory.destinationId = destination.id;
       }
     }
 
     if (!c.memory.destinationId) {
       var creepsWithNoEnergy = c.room.find(FIND_MY_CREEPS, {filter: (e) => e.memory.needsEnergy === true});
       if (creepsWithNoEnergy.length) {
-        c.memory.destinationId = c.pos.findClosestByPath(creepsWithNoEnergy).id;
-      }
+        var destination = c.pos.findClosestByPath(creepsWithNoEnergy);
+        if(!destination) return;
+        c.memory.destinationId = destination.id;
+       }
     }
 
     if (!c.memory.destinationId) {
       var containersWithNoEnergy = c.room.find(FIND_STRUCTURES, {filter: (e) => e.structureType === STRUCTURE_CONTAINER && e.store.energy < e.storeCapacity});
       if (containersWithNoEnergy.length) {
-        c.memory.destinationId = c.pos.findClosestByPath(containersWithNoEnergy).id;
+        var destination = c.pos.findClosestByPath(containersWithNoEnergy);
+        if(!destination) return;
+        c.memory.destinationId = destination.id;
       }
     }
 
