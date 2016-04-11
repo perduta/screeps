@@ -11,5 +11,11 @@ module.exports = () => {
     if (carriers.length < 4) s.createCreep([MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY], undefined, {role: 'carrier'});
     var attackers = _.filter(Game.creeps, c => c.memory.role == 'attacker');
     if (attackers.length < 0) s.createCreep([MOVE, ATTACK], undefined, {role: 'attacker'});
+
+    if(!s.memory.controllerLevel) s.memory.controllerLevel = s.room.controller.level;
+    if(s.memory.controllerLevel !== s.room.controller.level) {
+      Game.notify('WE HAVE SUCCESFULLY LEVELED UP OUR CONTROLLER IN ROOM ' + s.room.name + ', ACTUAL LEVEL: ' + s.room.controller);
+      delete s.memory.controllerLevel;
+    }
   }
 }
