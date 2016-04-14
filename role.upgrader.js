@@ -37,6 +37,6 @@ module.exports = (creep) => {
     }
 
     let controller = Game.getObjectById(creep.memory.controllerId);
-    let returnCode = creep.upgradeController(controller);
-    if (returnCode == ERR_NOT_IN_RANGE) creep.moveTo(controller);
+    if (!creep.pos.inRangeTo(controller, 3)) creep.moveTo(controller);
+    else creep.upgradeController(controller);
 };
