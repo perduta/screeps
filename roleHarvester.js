@@ -9,6 +9,7 @@ module.exports = (c) => {
     c.memory.source = closestSource.id;
   }
   var source = Game.getObjectById(c.memory.source);
-  var returnCode = c.harvest(source);
-  if(returnCode == ERR_NOT_IN_RANGE) c.moveTo(source);
-}
+  if(!c.pos.isNearTo(source)) console.log('er ' + c.moveTo(source));
+  else c.harvest(source);
+};
+

@@ -6,8 +6,8 @@ Creep.prototype.hasSetUp = function() {
 };
 
 Creep.prototype.setUp = function() {
-    // this version work only if storage is next to upgrader which is next to controller
-    let storages = this.room.find(FIND_MY_STRUCTURES, {filter: e => e.structureType == STRUCTURE_STORAGE});
+    // this version work only if storage or container is next to upgrader which is next to controller
+    let storages = this.room.find(FIND_STRUCTURES, {filter: e => e.structureType === STRUCTURE_CONTAINER || e.structureType === STRUCTURE_STORAGE});
     if (storages.length) {
         let storage = this.pos.findClosestByPath(storages);
         this.memory.storageId = storage.id;
@@ -33,6 +33,9 @@ module.exports = (creep) => {
  
     if (creep.carry.energy <= creep.memory.upgradePerTick + 1) {
         let storage = Game.getObjectById(creep.memory.storageId);
+        // if (!storage) delete creep.memory.storageId;
+        // return;
+        if (!creep.pos.isNearTo(storage)) creep.moveTo(storage);
         storage.transfer(creep, RESOURCE_ENERGY);
     }
 

@@ -1,3 +1,24 @@
+// function assignTargetToCreep(creep, findFor, findOpts) {
+//     var possibleTargets = creep.room.find(find, findOpts);
+//     var possibleTargetsIds = [];
+//     for (var i in possibleTargets) {
+//         var possibleTarget = possibleTargets[i];
+//         for(var j in possibleTarget.memory.neededCarriers) possibleTargetsIds.push(possibleTarget.id);
+//     }
+//     var carriersWithTargets = creep.room.find(FIND_MY_CREEPS, {filter: (e) => e.memory.role == 'carrier' && e.memory.target});
+//     var carriersWithTargetsIds = _.map(carriersWithTargets, (e) => e.id);
+//     var unclaimedTargetsIds = _.without()
+// }
+
+function setDestinationId(creep, findFor, findOpts) {
+    if (creep.memory.destinationId) return;
+    var targetsWithNoEnergy = creep.room.find(findFor, findOpts);
+    if (!targetsWithNoEnergy.length) return;
+    var destination = creep.pos.findClosestByPath(targetsWithNoEnergy);
+    if (!destination) return;
+    creep.memory.destinationId = destination.id;
+}
+
 module.exports = (c) => {
   if (!c.memory.collecting && c.carry.energy === 0) {
     c.memory.collecting = true;
@@ -29,33 +50,10 @@ module.exports = (c) => {
   // carrier is looking for target that needs energy and transfers it
   else {
     // first looking for target
-    if (!c.memory.destinationId) {
-      var spawnsAndExtensionsWithNoEnergy = c.room.find(FIND_MY_STRUCTURES, {filter: (e) => (e.structureType == STRUCTURE_SPAWN || e.structureType == STRUCTURE_EXTENSION || e.structureType == STRUCTURE_TOWER) && e.energy < e.energyCapacity});
-      if (spawnsAndExtensionsWithNoEnergy.length) {
-        var destination = c.pos.findClosestByPath(spawnsAndExtensionsWithNoEnergy);
-        if(!destination) return;
-        c.memory.destinationId = destination.id;
-      }
-    }
-
-    if (!c.memory.destinationId) {
-      var creepsWithNoEnergy = c.room.find(FIND_MY_CREEPS, {filter: (e) => e.memory.needsEnergy === true});
-      if (creepsWithNoEnergy.length) {
-        var destination = c.pos.findClosestByPath(creepsWithNoEnergy);
-        if(!destination) return;
-        c.memory.destinationId = destination.id;
-       }
-    }
-
-    if (!c.memory.destinationId) {
-      var containersWithNoEnergy = c.room.find(FIND_STRUCTURES, {filter: (e) => e.structureType === STRUCTURE_CONTAINER && e.store.energy < e.storeCapacity});
-      if (containersWithNoEnergy.length) {
-        var destination = c.pos.findClosestByPath(containersWithNoEnergy);
-        if(!destination) return;
-        c.memory.destinationId = destination.id;
-      }
-    }
-
+    setDestinationId(c, FIND_MY_STRUCTURES, {filter: (e) => e.structureType == STRUCTURE_TOWER && e.energy < e.energyCapacity / 2});
+    setDestinationId(c, FIND_MY_STRUCTURES, {filter: (e) => (e.structureType == STRUCTURE_SPAWN || e.structureType == STRUCTURE_EXTENSION) && e.energy < e.energyCapacity});
+    setDestinationId(c, FIND_STRUCTURES, {filter: (e) => (e.structureType === STRUCTURE_CONTAINER || e.structureType === STRUCTURE_STORAGE) && e.store.energy < e.storeCapacity});
+    
     // then transfering him energy
     var destination = Game.getObjectById(c.memory.destinationId);
     if(!destination) { delete c.memory.destinationId; return; }
@@ -64,3 +62,4 @@ module.exports = (c) => {
     else if (returnCode === ERR_NOT_IN_RANGE) c.moveTo(destination);
   }
 };
+
