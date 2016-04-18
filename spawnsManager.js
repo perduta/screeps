@@ -1,26 +1,61 @@
-module.exports = () => {
-  for (var key in Game.spawns) {
-    var s = Game.spawns[key];
+"use strict";
+// jshint esversion: 6, strict: global
 
-    var harvesters = _.filter(Game.creeps, c => c.memory.role == 'harvester');
-    if (harvesters.length < 2) s.createCreep([MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK], undefined, {role: 'harvester'});
-
-    var upgraders = _.filter(Game.creeps, c => c.memory.role == 'upgrader');
-    if (upgraders.length < 1) s.createCreep([MOVE, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK], undefined, {role: 'upgrader'});
-
-    var builders = _.filter(Game.creeps, c => c.memory.role == 'builder');
-    if (builders.length < 1) s.createCreep([MOVE, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK], undefined, {role: 'builder'});
-
-    var carriers = _.filter(Game.creeps, c => c.memory.role == 'carrier');
-    if (carriers.length < 6) s.createCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY], undefined, {role: 'carrier'});
-
-    var attackers = _.filter(Game.creeps, c => c.memory.role == 'attacker');
-    if (attackers.length < 0) s.createCreep([MOVE, ATTACK], undefined, {role: 'attacker'});
-
-    if(!s.memory.controllerLevel) s.memory.controllerLevel = s.room.controller.level;
-    if(s.memory.controllerLevel !== s.room.controller.level) {
-      Game.notify('WE HAVE SUCCESFULLY LEVELED UP OUR CONTROLLER IN ROOM ' + s.room.name + ', ACTUAL LEVEL: ' + s.room.controller);
-      delete s.memory.controllerLevel;
-    }
-  }
+function createCreep(spawn, role) {
+    let bodyParts = calculateParts(spawn, creepsDefinitions[role].requiredParts, creepsDefinitions[role].optionalParts);
+    spawn.createCreep(bodyParts, undefined, {role: role});
 }
+
+function calculateParts(s, required_parts, optional_parts) {
+    var cost = 0;
+    var maximum_cost = s.room.energyAvailable;
+    var parts = [];
+    for (var i in required_parts) {
+        var part = required_parts[i];
+        cost += BODYPART_COST[part];
+        if (cost > maximum_cost) {
+            throw 'cannot produce that creep';
+        }
+        parts.push(part);
+    }
+    
+    while (true) {
+        for(var i in optional_parts) {
+            var part = optional_parts[i];
+            cost += BODYPART_COST[part];
+            if (cost > maximum_cost) {
+                return parts;
+            }
+        }
+        
+        for(var i in optional_parts) {
+            var part = optional_parts[i];
+            parts.push(part);
+        }
+    }
+    return parts;
+}
+
+let creepsDefinitions = require('creepsDefinitions');
+
+module.exports = () => {
+    for (var spawnName in Game.spawns) {
+        var s = Game.spawns[spawnName];
+
+        let creepsByRole = {};
+        for (let creepName in Game.creeps) {
+            let creep = Game.creeps[creepName];
+            let creepRole = creep.memory.role;
+            if (!creepsByRole[creepRole]) creepsByRole[creepRole] = 0;
+            if (creep.room.name === s.room.name) creepsByRole[creepRole]++;
+        }
+
+        if (creepsByRole.scout < 1 && creepsByRole.harvester < 1 && creepsByRole.carrier < 1) createCreep(s, 'scout');
+        else if (creepsByRole.harvester < 2) createCreep(s, 'harvester');
+        else if (creepsByRole.carrier < 3) createCreep(s, 'carrier');
+        else if (creepsByRole.upgrader < 3) createCreep(s, 'upgrader');
+        else if (creepsByRole.builder < 3) createCreep(s, 'builder');
+
+    }
+};
+

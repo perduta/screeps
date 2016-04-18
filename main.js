@@ -2,7 +2,7 @@
 // jshint esversion: 6
 var garbageCollector = require('garbagecollector');
 var roomMonitor = require('room.monitor');
-var spawnsManager = require('manager.spawns');
+var spawnsManager = require('spawnsManager');
 var creepsManager = require('creepsManager');
 var towersManager = require('towersManager');
 
