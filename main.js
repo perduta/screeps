@@ -1,11 +1,15 @@
+// jshint esversion: 6
 var garbageCollector = require('garbagecollector');
+var roomMonitor = require('room.monitor');
 var spawnsManager = require('manager.spawns');
 var creepsManager = require('manager.creeps');
-var towersManager = require('manager.towers');
+var towersManager = require('towersManager');
 
 module.exports.loop = () => {
-  garbageCollector();
-  spawnsManager();
-  creepsManager();
-  towersManager();
+    //PathFinder.use(false);
+    garbageCollector();
+    roomMonitor();
+    creepsManager();
+    spawnsManager();
+    towersManager();
 };
