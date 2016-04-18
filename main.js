@@ -1,3 +1,4 @@
+"use strict";
 // jshint esversion: 6
 var garbageCollector = require('garbagecollector');
 var roomMonitor = require('room.monitor');
@@ -6,7 +7,6 @@ var creepsManager = require('creepsManager');
 var towersManager = require('towersManager');
 
 module.exports.loop = () => {
-    //PathFinder.use(false);
     garbageCollector();
     roomMonitor();
     creepsManager();
