@@ -3,7 +3,7 @@
 
 function createCreep(spawn, role) {
     let bodyParts = calculateParts(spawn, creepsDefinitions[role].requiredParts, creepsDefinitions[role].optionalParts);
-    spawn.createCreep(bodyParts, undefined, {role: role});
+    spawn.createCreep(bodyParts, undefined, {role: role, originRoom: spawn.room.name});
 }
 
 function calculateParts(s, required_parts, optional_parts) {
@@ -47,14 +47,14 @@ module.exports = () => {
             let creep = Game.creeps[creepName];
             let creepRole = creep.memory.role;
             if (!creepsByRole[creepRole]) creepsByRole[creepRole] = 0;
-            if (creep.room.name === s.room.name) creepsByRole[creepRole]++;
+            if (creep.memory.originRoom === s.room.name) creepsByRole[creepRole]++;
         }
 
         if (creepsByRole.scout < 1 && creepsByRole.harvester < 1 && creepsByRole.carrier < 1) createCreep(s, 'scout');
-        else if (creepsByRole.harvester < 2) createCreep(s, 'harvester');
-        else if (creepsByRole.carrier < 3) createCreep(s, 'carrier');
-        else if (creepsByRole.upgrader < 3) createCreep(s, 'upgrader');
-        else if (creepsByRole.builder < 3) createCreep(s, 'builder');
+        else if (creepsByRole.harvester < s.room.memory.neededHarvester) createCreep(s, 'harvester');
+        else if (creepsByRole.carrier < s.room.memory.neededCarrier) createCreep(s, 'carrier');
+        else if (creepsByRole.upgrader < s.room.memory.neededUpgrader) createCreep(s, 'upgrader');
+        else if (creepsByRole.builder < s.room.memory.neededBuilder) createCreep(s, 'builder');
 
     }
 };
