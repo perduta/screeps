@@ -1,15 +1,24 @@
 "use strict";
-// jshint esversion: 6
-var garbageCollector = require('garbagecollector');
-var roomMonitor = require('room.monitor');
-var spawnsManager = require('spawnsManager');
-var creepsManager = require('creepsManager');
-var towersManager = require('towersManager');
 
+let managerMemory = require('manager.memory');
+let managerSpawns = require('manager.spawns');
+let managerCreeps = require('manager.creeps');
+let managerTowers = require('manager.towers');
+let managerLabs = require('manager.labs');
+let managerRemoteRoomBuilder = require('manager.remoteRoomBuilder');
+let managerStatistics = require('manager.statistics');
+let profiler = require('screeps-profiler');
+//let lzString = require('lz-string.min');
+
+profiler.enable();
 module.exports.loop = () => {
-    garbageCollector();
-    roomMonitor();
-    creepsManager();
-    spawnsManager();
-    towersManager();
+    profiler.wrap(function() {
+        managerMemory();
+        managerCreeps();
+        managerSpawns();
+        managerTowers();
+        managerLabs();
+        managerRemoteRoomBuilder();
+        managerStatistics();
+    });
 };
