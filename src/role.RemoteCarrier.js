@@ -26,18 +26,22 @@ RemoteCarrier.prototype.checkState = function(creep) {
 
 RemoteCarrier.prototype.assignToFlag = function(creep) {
     let i = 0;
+    let remoteRooms = [];
     while(true) {
         if(creep.memory.remoteRoom) return;
         let remoteRoom = Game.flags[creep.memory.originRoom + '_remoteRoom_' + i];
         i++;
         if(!remoteRoom) break;
+        remoteRooms.push();
+    }
+    _.forEach(remoteRooms, remoteRoom => {
         _.forEach(remoteRoom.memory.carriers, carrier => {
             if(carrier.carrier && Game.getObjectById(carrier.carrier)) return;
             creep.memory.remoteRoom = remoteRoom.name;
             carrier.carrier = creep.id;
             return false;
         });
-    }
+    });
 };
 
 RemoteCarrier.prototype.xMoveTo = function(creep, pos) {
@@ -47,7 +51,7 @@ RemoteCarrier.prototype.xMoveTo = function(creep, pos) {
             swampCost: 10,
             roomCallback: function(roomName) {
                 if(!Game.rooms[roomName]) return;
-                let costs = new PathFinder.CostMatrix;
+                let costs = new PathFinder.CostMatrix();
 
                 let roads = creep.room.find(FIND_STRUCTURES, {filter: e => e.structureType === STRUCTURE_ROAD});
                 _.forEach(roads, e => costs.set(e.pos.x, e.pos.y, 1));

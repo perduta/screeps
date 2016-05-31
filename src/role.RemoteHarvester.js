@@ -10,11 +10,16 @@ RemoteHarvester.prototype.constructor = RemoteHarvester;
 
 RemoteHarvester.prototype.assignToFlag = function() {
     let i = 0;
+    let remoteRooms = [];
     while(true) {
         if(this.memory.remoteRoom && this.memory.source) return;
         let remoteRoom = Game.flags[this.memory.originRoom + '_remoteRoom_' + i];
         i++;
         if(!remoteRoom) break;
+        remoteRooms.push(remoteRoom);
+    }
+
+    _.forEach(remoteRooms, remoteRoom => {
         _.forEach(remoteRoom.memory.sources, source => {
             if(source.harvester && Game.getObjectById(source.harvester)) return;
             this.memory.remoteRoom = remoteRoom.name;
@@ -22,7 +27,7 @@ RemoteHarvester.prototype.assignToFlag = function() {
             source.harvester = this.id;
             return false;
         });
-    }
+    });
 };
 
 RemoteHarvester.prototype.work = function() {

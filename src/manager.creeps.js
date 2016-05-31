@@ -2,7 +2,7 @@
 
 let creepsObjects = {};
 
-let profiler = require('screeps-profiler');
+//let profiler = require('screeps-profiler');
 
 module.exports = () => {
     if (!Game.creeps) return;
@@ -19,7 +19,7 @@ module.exports = () => {
         let usedCpu = Game.cpu.getUsed();
         try {
             let creepObject = new creepsObjects[role](creep);
-            creepObject.work = profiler.registerFN(creepObject.work, role + '.work');
+//          creepObject.work = profiler.registerFN(creepObject.work, role + '.work');
             creepObject.work();
         } catch(err) {
             if(err) {
