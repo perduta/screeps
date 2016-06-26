@@ -7,10 +7,15 @@
         "module",
         "require",
         "console",
+        "global",
+
+        "kernel",
 
         "Game",
         "Memory",
         "PathFinder",
+        "Room",
+        "Creep",
 
         "MOVE",
         "WORK",
