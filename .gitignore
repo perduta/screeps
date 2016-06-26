@@ -1,3 +1,4 @@
 .tern-project
 .secrets.json
 node_modules
+dist/

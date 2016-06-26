@@ -1,21 +1,15 @@
-"use strict";
+'use strict';
 
-let managerMemory = require('manager.memory');
-let managerSpawns = require('manager.spawns');
-let managerCreeps = require('manager.creeps');
-let managerTowers = require('manager.towers');
-let managerLabs = require('manager.labs');
-let managerRemoteRoomBuilder = require('manager.remoteRoomBuilder');
-let managerStatistics = require('manager.statistics');
-//let profiler = require('screeps-profiler');
-//let lzString = require('lz-string.min');
+var Kernel = require('kernel.Kernel');
 
-module.exports.loop = () => {
-    managerMemory();
-    managerCreeps();
-    managerSpawns();
-    managerTowers();
-    managerLabs();
-    managerRemoteRoomBuilder();
-    managerStatistics();
+require('prototypes.Room');
+require('prototypes.Creep');
+
+module.exports.loop = function () {
+  global.kernel = new Kernel();
+
+  kernel.queueProcess('controller.creeps.Controller');
+  kernel.queueProcess('controller.rooms.Controller');
+
+  kernel.loop();
 };
